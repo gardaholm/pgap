@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Mietspiegel Geocoder</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.6/mapbox.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.6/mapbox.css' rel='stylesheet' />
+<style>
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:0; bottom:0; width:100%; }
+</style>
+</head>
+<body>
+<style>
+  pre.ui-output {
+    display:block;
+    position:absolute;
+    bottom:10px;
+    left:10px;
+    padding:5px 10px;
+    background:rgba(0,0,0,0.5);
+    color:#fff;
+    font-size:11px;
+    line-height:18px;
+    border-radius:3px;
+    max-height:50%;
+    max-width:25%;
+    overflow:auto;
+    word-wrap: break-word;
+    white-space:pre-wrap;
+    }
+    pre.ui-output:empty { padding:0; }
+</style>
+<div id='map'></div>
+<pre id='output' class='ui-output'></pre>
+<script>
+
+
+// JS-Function to get Variables from URL
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+// Get POI Variable from URL
+thisAddress = getParameterByName('poi'); 
+  
+// Draw Mapbos     
+L.mapbox.accessToken = 'pk.eyJ1IjoiY2hlZGkwOSIsImEiOiIyM0YxRGdvIn0.DfUljyQ38_tlMrkakJIAuQ';
+   	var geocoder = L.mapbox.geocoder('mapbox.places'),
+   	map = L.mapbox.map('map', 'chedi09.lh786hlh', {maxZoom: 15, attributionControl: true});
+
+// Geocode Input Location
+geocoder.query(thisAddress, showMap);
+
+// Set Viewport to Input Location
+function showMap(err, data) {
+    if (data.lbounds) {
+	    map.setView([data.latlng[0], data.latlng[1]], 16);
+    } else if (data.latlng) {
+        map.setView([data.latlng[0], data.latlng[1]], 16);
+    }
+}
+   
+// Draw Marker on Input Location     
+var addMarker;
+addMarker = function(geocoder, map, placeName) {
+	return geocoder.query(placeName, function(error, result) {
+    	var marker;
+    	marker = L.marker(result.latlng);
+    	return marker.addTo(map);
+    });
+};
+addMarker(geocoder, map, thisAddress);
+    
+
+</script>
+</body>
+</html>
